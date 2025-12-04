@@ -3,21 +3,18 @@
 
 #define FLUID_INTERACTION_RADIUS 10.0f
 
-//FluidField field;
+FluidField field;
 
 void Setup(AlxWindow* w){
-    //field = FluidField_New(
-    //    GetWidth(w),
-    //    GetHeight(w)
-    //);
-
-    init();
+    field = FluidField_New(
+        GetWidth(w),
+        GetHeight(w)
+    );
 }
 void Update(AlxWindow* w){
     if(Stroke(ALX_MOUSE_L).DOWN){
         const Vec2 dir = Vec2_Mulf(Vec2_Sub(GetMouse(),GetMouseBefore()),10.0f);
-        //FluidField_Interact(&field,GetMouse().x,GetMouse().y,dir,FLUID_INTERACTION_RADIUS);
-        apply_point_force(GetMouse().x,GetMouse().y,dir.x,dir.y,FLUID_INTERACTION_RADIUS);
+        FluidField_ApplyPointForce(&field,GetMouse().x,GetMouse().y,dir.x,dir.y,FLUID_INTERACTION_RADIUS);
     }
 
     //FluidField_Update(&field,w->ElapsedTime);
@@ -26,12 +23,12 @@ void Update(AlxWindow* w){
     
     //FluidField_Render(WINDOW_STD_ARGS,&field,(Vec2){ 0.0f,0.0f });
 
-    step();
+    FluidField_Step(&field);
 
-    for(unsigned int y = 0;y<NY;y++){
-		for(unsigned int x = 0;x<NX;x++){
-			const float uc = u[y * NX + x];
-			const float vc = v[y * NX + x];
+    for(unsigned int y = 0;y<FLUIDFIELD_NY;y++){
+		for(unsigned int x = 0;x<FLUIDFIELD_NX;x++){
+			const float uc = field.u[y * FLUIDFIELD_NX + x];
+			const float vc = field.v[y * FLUIDFIELD_NX + x];
 
 			// const Pixel c = Pixel_toRGBA(
 			// 	F32_Clamp(fabsf(uc),0.0f,1.0f),
@@ -48,14 +45,12 @@ void Update(AlxWindow* w){
 				1.0f
 			);
 
-			w->Buffer[y * NX + x] = c;
+			w->Buffer[y * FLUIDFIELD_NX + x] = c;
 		}
 	}
 }
 void Delete(AlxWindow* w){
-    //FluidField_Free(&field);
-
-    destroy();
+    FluidField_Free(&field);
 }
 
 int main() {
